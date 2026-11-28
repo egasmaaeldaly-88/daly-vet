@@ -3,10 +3,12 @@
 Read `CLAUDE.md` first. Update this file at the end of every step. Keep it short.
 
 ## Current state
-- React + Vite + Tailwind, AR/EN toggle, light/dark. Demo state is in-memory (seed data in `src/mockData.js`), no backend, **no D1 database yet**.
+- React + Vite + Tailwind, AR/EN toggle, light/dark. Demo state is in-memory (seed data in `src/mockData.js`), no backend yet (D1 exists but is not connected, see below).
 - Tabs: Home, Check-in & waiting board (Step 1), **Consultation & estimate (Step 2)**, Passport (mock).
 - Public owner page: `#/estimate/<uuid>` (hash route, no router library).
-- Deployed on a Cloudflare **Pages** project connected to GitHub (build: `npm run build`, output: `dist`, no deploy command).
+- Live: https://daly-vet.pages.dev — Cloudflare **Pages** project connected to GitHub repo `egasmaaeldaly-88/daly-vet` (branch `main`, build `npm run build`, output `dist`). Every push to `main` deploys automatically.
+- Steps 1 and 2 are deployed and the owner clicked through them on the live site: all OK.
+- **D1 exists** (`daly-vet-db`, `database_id` is set in `wrangler.toml` in the owner's repo). The 5 tables from `schema.sql` (`pets`, `vaccinations`, `medical_records`, `visits`, `estimates`) were created through the Cloudflare dashboard Console. The app does **not** read or write D1 yet and Pages has **no D1 binding** yet.
 
 ## Decisions
 - Free tier only. `wa.me` links only. No paid APIs, no AI API calls.
@@ -24,14 +26,18 @@ Read `CLAUDE.md` first. Update this file at the end of every step. Keep it short
 - Schema approved and added to `schema.sql` (not applied to D1 yet): `visits`, `estimates`. `invoice_items` comes in Step 3.
 - Removed from the old mock: the Consult screen with fixed sample text and the "prescription preview" (printable prescription view is a later "small" item).
 
+## Ops notes (learned the hard way)
+- The owner works from the local clone `C:\KSA projects\daly-vet-repo` (Windows, PowerShell). Copying files into it comes from a zip that Claude produces; the real `wrangler.toml` in that clone has the real `database_id`, so **never overwrite `wrangler.toml` with the placeholder version** — edit it in place or leave it untouched.
+- The sandbox where Claude works has no network: `npm install` / `npm run build` cannot run there. The owner runs `npm run build` locally and reports the result.
+- If Pages stops deploying with "project is disconnected from your Git account", the fix is on the GitHub side: Settings → Applications → Cloudflare Workers & Pages → Configure → give access to the repo (or uninstall and reinstall the app).
+
 ## Done
 - Step 0: scaffold and first deploy.
 - Step 1: rename to Daly Track Vet + check-in form and waiting board. `npm run build` passed on the owner's machine (Vite 5.4) and the deploy worked.
-- Step 2: consultation + estimate + owner approval page + 2 new tables in `schema.sql` (validated in SQLite: creates cleanly, runs twice without errors, foreign keys work).
-- Build status for Step 2: `npm run build` was **not run** here (sandbox has no network). Files were compiled with esbuild and server-rendered in a smoke test (both languages, empty/builder/sent/approved states, owner page has no phone or owner name). Not tested in a real browser: clicking, dictation, `wa.me`. Run `npm install && npm run build` and click through locally.
+- Step 2: consultation + estimate + owner approval page + 2 new tables in `schema.sql` (validated in SQLite, and created in the real D1). `npm run build` passes on the owner's machine (40 modules); deployed and checked on the live site by the owner.
 
 ## Next step
-- **Step 3**: charge guard — before closing the invoice, compare what the vet recorded (exam, X-ray, injection, vaccine, lab) with the invoice lines and flag anything missing. Needs the `invoice_items` table: show the schema diff and wait for approval first. Stop after it and wait for confirmation.
+- **Step 3** (not started): charge guard — before closing the invoice, compare what the vet recorded (exam, X-ray, injection, vaccine, lab) with the invoice lines and flag anything missing. Needs the `invoice_items` table: show the schema diff and wait for approval first (and remind the owner to run the new SQL in the D1 Console afterwards). Stop after it and wait for confirmation.
 
 ## Open questions
 - Real service prices and the real clinic emergency phone number (placeholders for now).
