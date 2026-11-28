@@ -63,6 +63,9 @@ export default function Consult({ t, lang, visits, setVisits, estimates, setEsti
 
   const draft = visit.draft ?? emptyDraft()
   const est = estimates.find((e) => e.visitId === visit.id)
+  const performed = visit.performed ?? []
+  const togglePerformed = (sid) =>
+    patch({ performed: performed.includes(sid) ? performed.filter((x) => x !== sid) : [...performed, sid] })
   const toggle = (opt, sid) =>
     patch({ draft: { ...draft, [opt]: draft[opt].includes(sid) ? draft[opt].filter((x) => x !== sid) : [...draft[opt], sid] } })
 
@@ -114,6 +117,21 @@ export default function Consult({ t, lang, visits, setVisits, estimates, setEsti
         <p role="status" className="mt-2 min-h-5 text-xs text-muted">
           {!dict.supported ? t.consult.dictateNA : dict.error ? t.consult.dictateErr : dict.listening ? t.consult.listening : ''}
         </p>
+      </Card>
+
+      <Card title={t.consult.performed}>
+        <p className="mb-3 text-sm text-muted">{visit.closedAt ? t.consult.performedLocked : t.consult.performedHint}</p>
+        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {SERVICES.map((s) => (
+            <li key={s.id}>
+              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 ${performed.includes(s.id) ? 'border-brand bg-tint font-semibold text-brand' : 'border-line'}`}>
+                <input type="checkbox" className="h-5 w-5" style={{ accentColor: 'var(--brand)' }}
+                  checked={performed.includes(s.id)} disabled={!!visit.closedAt} onChange={() => togglePerformed(s.id)} />
+                <span>{tx(s.name, lang)}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
       </Card>
 
       {est ? (

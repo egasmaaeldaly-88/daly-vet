@@ -15,3 +15,12 @@ export const optionTotal = (ids) =>
   ids.reduce((sum, id) => sum + (SERVICES.find((s) => s.id === id)?.price ?? 0), 0)
 
 export const money = (n, lang) => (lang === 'ar' ? `${n} ر.س` : `SAR ${n}`)
+
+// Step 3 — charge guard.
+export const findService = (id) => SERVICES.find((s) => s.id === id)
+
+/** Ids the vet recorded as done that have no line on the invoice (matched by service id, not quantity). */
+export const missingServices = (performed = [], items = []) =>
+  performed.filter((id) => !items.some((i) => i.serviceId === id))
+
+export const invoiceTotal = (items = []) => items.reduce((sum, i) => sum + i.qty * i.price, 0)

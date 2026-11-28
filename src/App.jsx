@@ -5,6 +5,7 @@ import { pets, vaccinations, summaries, clinic, seedVisits } from './mockData.js
 import { Paw, Card, Brand } from './ui.jsx'
 import CheckIn from './CheckIn.jsx'
 import Consult from './Consult.jsx'
+import Invoice from './Invoice.jsx'
 import OwnerEstimate from './OwnerEstimate.jsx'
 
 const read = (k, d) => { try { return localStorage.getItem(k) || d } catch { return d } }
@@ -49,8 +50,8 @@ export default function App() {
   }, [theme])
 
   const petOf = (id) => pets.find((p) => p.id === id)
-  const tabs = ['home', 'checkin', 'consult', 'passport']
-  const icons = { home: 'M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z', checkin: 'M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z', consult: 'M9 12h6m-6 4h6M7 3h7l5 5v13H7z', passport: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-4v-2' }
+  const tabs = ['home', 'checkin', 'consult', 'invoice', 'passport']
+  const icons = { home: 'M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z', checkin: 'M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z', consult: 'M9 12h6m-6 4h6M7 3h7l5 5v13H7z', invoice: 'M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6m-6 4h6', passport: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v6h-4v-2' }
   const NavIcon = ({ id }) => (
     <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={icons[id]} /></svg>
   )
@@ -167,14 +168,15 @@ export default function App() {
           {toggles}
         </header>
         <main className="flex-1 px-4 py-6 md:px-8">
-          {/* CheckIn and Consult are rendered as elements (not inner components) so typed text survives language/theme toggles. */}
+          {/* CheckIn, Consult and Invoice are rendered as elements (not inner components) so typed text survives language/theme toggles. */}
           {tab === 'checkin' ? <CheckIn t={t} lang={lang} visits={visits} setVisits={setVisits} />
             : tab === 'consult' ? <Consult t={t} lang={lang} visits={visits} setVisits={setVisits} estimates={estimates} setEstimates={setEstimates} />
+            : tab === 'invoice' ? <Invoice t={t} lang={lang} visits={visits} setVisits={setVisits} />
             : <Screen />}
         </main>
       </div>
 
-      <nav className="no-print fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-line bg-card md:hidden">
+      <nav className="no-print fixed inset-x-0 bottom-0 z-10 grid grid-cols-5 border-t border-line bg-card md:hidden">
         {tabs.map((id) => (
           <button key={id} onClick={() => setTab(id)} aria-current={tab === id ? 'page' : undefined}
             className={`flex flex-col items-center gap-1 px-1 py-2.5 text-[11px] ${tab === id ? 'font-semibold text-brand' : 'text-muted'}`}>
