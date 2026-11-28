@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 // Small shared UI pieces (moved out of App.jsx so Step 1 screens can reuse them).
 
 export const Paw = ({ className = 'h-5 w-5' }) => (
@@ -29,3 +31,16 @@ export const Brand = ({ brand, product, stacked = false }) => (
     <span className="rounded-md bg-tint px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand">{product}</span>
   </span>
 )
+
+/** Image with a safe fallback when the local file is missing. */
+export function PetImg({ src, label, className }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) {
+    return (
+      <div role="img" aria-label={label} className={`${className} grid place-items-center bg-tint text-brand`}>
+        <Paw className="h-12 w-12" />
+      </div>
+    )
+  }
+  return <img src={src} alt="" loading="lazy" decoding="async" onError={() => setFailed(true)} className={`${className} object-cover`} />
+}

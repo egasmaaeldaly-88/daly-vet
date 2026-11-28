@@ -30,3 +30,25 @@ export function formatSaPhone(p) {
 
 /** Pick the right language from a bilingual `{ ar, en }` value, or return a plain string as-is. */
 export const tx = (v, lang) => (typeof v === 'string' ? v : v?.[lang] ?? '')
+
+// Step 4 — recall list. A vaccination is `overdue` when its due date has passed, `soon` when it falls
+// within RECALL_WINDOW_DAYS, otherwise `ok`. Computed from the date (no stored state).
+export const RECALL_WINDOW_DAYS = 30
+
+/** Whole days from today to a `YYYY-MM-DD` due date (negative = overdue, 0 = today). NaN if the date is invalid. */
+export function daysUntilDue(due, now = new Date()) {
+  const [y, m, d] = String(due).split('-').map(Number)
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  return Math.round((new Date(y, m - 1, d) - today) / 86400000)
+}
+
+export function vaccStatus(due, now) {
+  const n = daysUntilDue(due, now)
+  return n < 0 ? 'overdue' : n <= RECALL_WINDOW_DAYS ? 'soon' : 'ok'
+}
+
+/** `2026-12-02` -> localized short date (parsed as a local date, so no timezone shift). */
+export function formatDueDate(due, lang) {
+  const [y, m, d] = String(due).split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString(lang === 'ar' ? 'ar-SA-u-ca-gregory' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}

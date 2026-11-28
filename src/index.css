@@ -33,4 +33,10 @@ body { @apply bg-page text-ink font-sans antialiased; }
 :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
-@media print { .no-print { display: none !important; } }
+@media print {
+  .no-print { display: none !important; }
+  :root, :root.dark {
+    --page: #fff; --card: #fff; --sunk: #fff; --ink: #000; --muted: #333; --line: #999;
+    --brand: #1d5a3f; --brand-ink: #fff; --tint: #fff; --warn: #000; --warn-tint: #fff;
+  }
+}

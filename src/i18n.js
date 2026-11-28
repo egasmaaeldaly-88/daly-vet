@@ -1,3 +1,7 @@
+// Arabic day counts: 1 يوم، 2 يومين، 3-10 أيام، 11+ يومًا.
+const arDays = (n) => (n === 1 ? 'يوم' : n === 2 ? 'يومين' : n >= 3 && n <= 10 ? `${n} أيام` : `${n} يومًا`)
+const enDays = (n) => `${n} ${n === 1 ? 'day' : 'days'}`
+
 export const dict = {
   ar: {
     app: 'Daly Track Vet',
@@ -7,8 +11,8 @@ export const dict = {
     welcome: 'أهلاً بك في عيادتك',
     welcomeSub: 'سجّل وصول الحيوانات، تابع دورها في الانتظار، واكتب الروشتة وشارك الباسبور الصحي في مكان واحد.',
     demoNote: 'بيانات تجريبية للعرض فقط',
-    nav: { home: 'الرئيسية', checkin: 'الاستقبال ولوحة الانتظار', consult: 'الكشف والتقدير', invoice: 'الفاتورة', passport: 'الباسبور الصحي' },
-    role: { checkin: 'موظف الاستقبال', consult: 'الطبيب البيطري', invoice: 'موظف الاستقبال', passport: 'صفحة عامة لصاحب الحيوان' },
+    nav: { home: 'الرئيسية', checkin: 'الاستقبال ولوحة الانتظار', consult: 'الكشف والتقدير', invoice: 'الفاتورة', recall: 'التذكيرات', manager: 'لوحة المدير', passport: 'الباسبور الصحي' },
+    role: { checkin: 'موظف الاستقبال', consult: 'الطبيب البيطري', invoice: 'موظف الاستقبال', recall: 'موظف الاستقبال', manager: 'مدير العيادة', passport: 'صفحة عامة لصاحب الحيوان' },
     lang: 'English', themeLight: 'الوضع الفاتح', themeDark: 'الوضع الداكن',
     stats: { pets: 'حيوانات مسجلة', due: 'تطعيمات قريبة', boarded: 'في الإقامة' },
     checkin: {
@@ -72,6 +76,43 @@ export const dict = {
       closeAnyway: 'نعم، أغلق الفاتورة بدون الناقص', cancel: 'رجوع',
       closedOk: (pet, total) => `تم إغلاق فاتورة ${pet}. الإجمالي: ${total}`,
     },
+    stay: {
+      title: 'الإقامة والتجميل',
+      hint: 'حدّد وضع كل حيوان. عدد الحيوانات في الإقامة يظهر في الأعلى.',
+      of: (pet) => `حالة ${pet}`,
+      status: { none: 'لا يوجد', boarding: 'في الإقامة', grooming: 'في التجميل' },
+    },
+    manager: {
+      title: 'لوحة المدير',
+      hint: 'الأرقام محسوبة من بيانات هذه الجلسة التجريبية.',
+      revenue: 'إيراد اليوم', revenueNote: (n) => `من ${n} فاتورة مغلقة اليوم`,
+      missed: 'خدمات فايتة تم اكتشافها', missedNote: (v) => `قيمتها ${v}`,
+      waits: (m) => `انتظار أكثر من ${m} دقيقة`, waitsNote: 'حالات ما زالت في الانتظار',
+      noShowNote: 'لا يوجد حجز مواعيد في النظام بعد، لذلك لا يمكن حساب «لم يحضر» الفعلي. هذا الرقم يقيس الانتظار الطويل فقط.',
+      overdue: 'تطعيمات متأخرة', openRecall: 'فتح التذكيرات',
+    },
+    rx: {
+      title: 'الروشتة',
+      hint: 'اكتب الأدوية والتعليمات كما تريد أن تظهر في الورقة المطبوعة.',
+      label: 'نص الروشتة', ph: 'اكتب الأدوية والجرعات والتعليمات هنا…',
+      need: 'اكتب نص الروشتة أولاً.',
+      view: 'عرض الروشتة للطباعة', print: 'طباعة', back: 'رجوع',
+      sheet: 'روشتة بيطرية', date: 'التاريخ', patient: 'الحيوان', owner: 'المالك',
+      signature: 'توقيع الطبيب', clinicPhone: 'هاتف العيادة',
+    },
+    recall: {
+      title: 'تذكيرات التطعيمات',
+      intro: (n) => `التطعيمات المتأخرة، والتي يحين موعدها خلال ${n} يومًا. الزر يفتح واتساب برسالة جاهزة ولا يرسلها تلقائيًا؛ أنت من يضغط إرسال.`,
+      overdue: 'متأخرة', soon: (n) => `قريبة (خلال ${n} يومًا)`,
+      empty: 'لا توجد تطعيمات هنا',
+      due: 'الموعد', owner: 'المالك',
+      late: (n) => `متأخر منذ ${arDays(n)}`, in: (n) => `بعد ${arDays(n)}`, today: 'اليوم',
+      send: 'إرسال تذكير عبر واتساب', resend: 'إرسال مرة أخرى',
+      sent: 'تم فتح رسالة التذكير',
+      wa: (owner, pet, vaccine, date, overdue) => overdue
+        ? `مرحباً ${owner}، موعد تطعيم ${pet} (${vaccine}) كان بتاريخ ${date}. نرجو التواصل معنا لحجز موعد في أقرب وقت.`
+        : `مرحباً ${owner}، موعد تطعيم ${pet} (${vaccine}) بتاريخ ${date}. نرجو التواصل معنا لحجز موعد.`,
+    },
     estimate: {
       title: (pet) => `تقدير علاج ${pet}`,
       intro: 'اطّلع على الخيارات الثلاثة واختر ما يناسبك. الأسعار بالريال السعودي.',
@@ -86,6 +127,8 @@ export const dict = {
       title: 'الباسبور الصحي الرقمي', scan: 'امسح الرمز لفتح الباسبور', allergies: 'الحساسية',
       vacc: 'التطعيمات', summaries: 'ملخصات معتمدة', emergency: 'طوارئ العيادة', next: 'الجرعة القادمة',
       privacy: 'لا تُعرض بيانات المالك في هذه الصفحة.',
+      choose: 'اختر الحيوان', openPublic: 'فتح الصفحة العامة', noSummaries: 'لا توجد ملخصات معتمدة بعد.',
+      notFound: 'هذا الرابط غير موجود.', back: 'رجوع إلى العيادة (للعرض التجريبي)',
     },
     species: { dog: 'كلب', cat: 'قطة' }, kg: 'كجم',
     imgFallback: 'صورة غير متاحة',
@@ -98,8 +141,8 @@ export const dict = {
     welcome: 'Welcome to your clinic',
     welcomeSub: 'Check pets in, follow their turn in the waiting room, write prescriptions and share the health passport — all in one place.',
     demoNote: 'Demo data for preview only',
-    nav: { home: 'Home', checkin: 'Check-in & waiting board', consult: 'Consultation & estimate', invoice: 'Invoice', passport: 'Health passport' },
-    role: { checkin: 'Receptionist', consult: 'Veterinarian', invoice: 'Receptionist', passport: 'Public page for pet owners' },
+    nav: { home: 'Home', checkin: 'Check-in & waiting board', consult: 'Consultation & estimate', invoice: 'Invoice', recall: 'Recall', manager: 'Manager board', passport: 'Health passport' },
+    role: { checkin: 'Receptionist', consult: 'Veterinarian', invoice: 'Receptionist', recall: 'Receptionist', manager: 'Clinic manager', passport: 'Public page for pet owners' },
     lang: 'العربية', themeLight: 'Light mode', themeDark: 'Dark mode',
     stats: { pets: 'Registered pets', due: 'Vaccines due soon', boarded: 'Currently boarded' },
     checkin: {
@@ -163,6 +206,43 @@ export const dict = {
       closeAnyway: 'Yes, close without the missing services', cancel: 'Go back',
       closedOk: (pet, total) => `${pet}’s invoice is closed. Total: ${total}`,
     },
+    stay: {
+      title: 'Boarding & grooming',
+      hint: 'Set each pet’s status. The number of boarded pets shows at the top.',
+      of: (pet) => `Status of ${pet}`,
+      status: { none: 'None', boarding: 'Boarding', grooming: 'Grooming' },
+    },
+    manager: {
+      title: 'Manager board',
+      hint: 'Numbers are calculated from this demo session’s data.',
+      revenue: 'Revenue today', revenueNote: (n) => `From ${n} invoice(s) closed today`,
+      missed: 'Missed charges caught', missedNote: (v) => `Worth ${v}`,
+      waits: (m) => `Waiting over ${m} minutes`, waitsNote: 'Pets still in the waiting column',
+      noShowNote: 'There is no appointment booking in the system yet, so real no-shows cannot be calculated. This number only measures long waits.',
+      overdue: 'Overdue vaccines', openRecall: 'Open recall list',
+    },
+    rx: {
+      title: 'Prescription',
+      hint: 'Write the medicines and instructions exactly as they should appear on the printed sheet.',
+      label: 'Prescription text', ph: 'Write medicines, doses and instructions here…',
+      need: 'Write the prescription text first.',
+      view: 'Show printable prescription', print: 'Print', back: 'Back',
+      sheet: 'Veterinary prescription', date: 'Date', patient: 'Pet', owner: 'Owner',
+      signature: 'Veterinarian’s signature', clinicPhone: 'Clinic phone',
+    },
+    recall: {
+      title: 'Vaccine reminders',
+      intro: (n) => `Overdue vaccines and those due within ${n} days. The button opens WhatsApp with a ready message and does not send it automatically; you press send.`,
+      overdue: 'Overdue', soon: (n) => `Due soon (within ${n} days)`,
+      empty: 'No vaccines here',
+      due: 'Due', owner: 'Owner',
+      late: (n) => `${enDays(n)} overdue`, in: (n) => `In ${enDays(n)}`, today: 'Today',
+      send: 'Send reminder on WhatsApp', resend: 'Send again',
+      sent: 'Reminder message opened',
+      wa: (owner, pet, vaccine, date, overdue) => overdue
+        ? `Hello ${owner}, ${pet}’s ${vaccine} vaccine was due on ${date}. Please contact us to book an appointment as soon as possible.`
+        : `Hello ${owner}, ${pet}’s ${vaccine} vaccine is due on ${date}. Please contact us to book an appointment.`,
+    },
     estimate: {
       title: (pet) => `Treatment estimate for ${pet}`,
       intro: 'Review the three options and choose what suits you. Prices are in Saudi riyals.',
@@ -177,6 +257,8 @@ export const dict = {
       title: 'Digital pet health passport', scan: 'Scan the code to open the passport', allergies: 'Allergies',
       vacc: 'Vaccinations', summaries: 'Approved summaries', emergency: 'Clinic emergency line', next: 'Next due',
       privacy: 'Owner details are never shown on this page.',
+      choose: 'Choose a pet', openPublic: 'Open the public page', noSummaries: 'No approved summaries yet.',
+      notFound: 'This link was not found.', back: 'Back to the clinic (demo)',
     },
     species: { dog: 'Dog', cat: 'Cat' }, kg: 'kg',
     imgFallback: 'Image unavailable',

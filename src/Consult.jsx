@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Card, Chip } from './ui.jsx'
 import { SERVICES, OPTIONS, emptyDraft, optionTotal, money } from './services.js'
 import { tx } from './utils.js'
+import Prescription from './Prescription.jsx'
 
 // Browser Web Speech API (Chrome). No server, no paid service. Typing always works as a fallback.
 const SR = typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null
@@ -45,6 +46,7 @@ export default function Consult({ t, lang, visits, setVisits, estimates, setEsti
   const queue = visits.filter((v) => v.status === 'with_vet')
   const [sel, setSel] = useState(null)
   const [err, setErr] = useState('')
+  const [showRx, setShowRx] = useState(false)
   const visit = queue.find((v) => v.id === sel) ?? queue[0]
 
   const patch = (p) => visit && setVisits((vs) => vs.map((v) => (v.id === visit.id ? { ...v, ...p } : v)))
@@ -60,6 +62,8 @@ export default function Consult({ t, lang, visits, setVisits, estimates, setEsti
       </Card>
     )
   }
+
+  if (showRx) return <Prescription t={t} lang={lang} visit={visit} onBack={() => setShowRx(false)} />
 
   const draft = visit.draft ?? emptyDraft()
   const est = estimates.find((e) => e.visitId === visit.id)
@@ -134,6 +138,18 @@ export default function Consult({ t, lang, visits, setVisits, estimates, setEsti
             </li>
           ))}
         </ul>
+      </Card>
+
+      <Card title={t.rx.title}>
+        <p className="mb-3 text-sm text-muted">{t.rx.hint}</p>
+        <label htmlFor="rx-text" className="mb-1 block text-sm font-medium">{t.rx.label}</label>
+        <textarea id="rx-text" rows={5} value={visit.rx || ''} onChange={(e) => patch({ rx: e.target.value })} placeholder={t.rx.ph}
+          className="w-full rounded-xl border border-line bg-card px-3 py-2.5 outline-none focus:border-brand" />
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button type="button" disabled={!(visit.rx || '').trim()} onClick={() => setShowRx(true)}
+            className="rounded-xl bg-brand px-4 py-2.5 font-semibold text-brand-ink hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40">{t.rx.view}</button>
+          {!(visit.rx || '').trim() && <span className="text-sm text-muted">{t.rx.need}</span>}
+        </div>
       </Card>
 
       {est ? (
