@@ -11,7 +11,7 @@ pages_build_output_dir = "dist"        # Vite build output served by Pages
 [[d1_databases]]
 binding = "DB"
 database_name = "daly-vet-db"
-database_id = "REPLACE_WITH_DATABASE_ID"
+database_id = "f84f4461-eb47-4572-99b9-643b179f9be9"
 
 # Apply schema.sql:
 #   local  -> npm run db:local

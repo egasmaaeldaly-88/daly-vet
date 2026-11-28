@@ -4,6 +4,8 @@ import { dict } from './i18n.js'
 import { pets, vaccinations, summaries, clinic, seedVisits } from './mockData.js'
 import { Paw, Card, Brand } from './ui.jsx'
 import CheckIn from './CheckIn.jsx'
+import Consult from './Consult.jsx'
+import OwnerEstimate from './OwnerEstimate.jsx'
 
 const read = (k, d) => { try { return localStorage.getItem(k) || d } catch { return d } }
 const write = (k, v) => { try { localStorage.setItem(k, v) } catch { /* storage unavailable */ } }
@@ -26,6 +28,8 @@ export default function App() {
   const [theme, setTheme] = useState(() => read('dv-theme', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
   const [tab, setTab] = useState('home')
   const [visits, setVisits] = useState(seedVisits) // demo state lives in the browser (in-memory)
+  const [estimates, setEstimates] = useState([]) // demo state (in-memory)
+  const [route, setRoute] = useState(() => location.hash)
   const t = dict[lang]
   const L = (o) => o[lang]
   const locale = lang === 'ar' ? 'ar-SA-u-ca-gregory' : 'en-GB'
@@ -35,6 +39,11 @@ export default function App() {
     const h = document.documentElement
     h.lang = lang; h.dir = lang === 'ar' ? 'rtl' : 'ltr'; write('dv-lang', lang)
   }, [lang])
+  useEffect(() => {
+    const on = () => setRoute(location.hash)
+    addEventListener('hashchange', on)
+    return () => removeEventListener('hashchange', on)
+  }, [])
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark'); write('dv-theme', theme)
   }, [theme])
@@ -69,32 +78,6 @@ export default function App() {
       <p className="text-sm text-muted">{t.demoNote}</p>
     </div>
   )
-
-  const Consult = () => {
-    const p = pets[1]
-    return (
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card title={t.consult.patient}>
-          <div className="flex items-center gap-4">
-            <PetImg src={`/images/${p.species}-3d.jpg`} label={t.species[p.species]} className="h-20 w-20 rounded-2xl" />
-            <div>
-              <div className="text-xl font-semibold">{L(p.name)}</div>
-              <div className="text-muted">{L(p.breed)}</div>
-            </div>
-          </div>
-          <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-xl bg-sunk p-3"><dt className="text-muted">{t.consult.species}</dt><dd className="font-medium">{t.species[p.species]}</dd></div>
-            <div className="rounded-xl bg-sunk p-3"><dt className="text-muted">{t.consult.weight}</dt><dd className="font-medium">{p.weight} {t.kg}</dd></div>
-          </dl>
-        </Card>
-        <Card title={t.consult.exam}>
-          <p className="leading-relaxed">{L(summaries.exam)}</p>
-          <p className="mt-2 leading-relaxed">{L(summaries.xray)}</p>
-          <p className="mt-5 rounded-xl border border-dashed border-line p-3 text-sm text-muted">{t.consult.next}</p>
-        </Card>
-      </div>
-    )
-  }
 
   const Passport = () => {
     const p = pets[0]
@@ -132,8 +115,32 @@ export default function App() {
     )
   }
 
-  const screens = { home: Home, consult: Consult, passport: Passport }
+  const screens = { home: Home, passport: Passport }
   const Screen = screens[tab]
+  const approve = (uuid, opt) => setEstimates((es) => es.map((e) => (e.uuid === uuid && !e.approved ? { ...e, status: 'approved', approved: opt } : e)))
+  const toggles = (
+    <div className="flex gap-2">
+      <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="rounded-full border border-line px-3.5 py-1.5 text-sm hover:bg-sunk">{t.lang}</button>
+      <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="rounded-full border border-line px-3.5 py-1.5 text-sm hover:bg-sunk">{theme === 'dark' ? t.themeLight : t.themeDark}</button>
+    </div>
+  )
+
+  // Public owner page: #/estimate/<uuid>. No clinic navigation, no owner contact details.
+  const owner = /^#\/estimate\/([\w-]+)$/.exec(route)
+  if (owner) {
+    return (
+      <div className="min-h-screen">
+        <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 md:px-8">
+          <div className="flex items-center gap-2 text-brand"><Paw className="h-6 w-6" /><Brand brand={t.brand} product={t.product} /></div>
+          {toggles}
+        </header>
+        <main className="mx-auto max-w-4xl px-4 py-6 md:px-8">
+          <OwnerEstimate t={t} lang={lang} estimate={estimates.find((e) => e.uuid === owner[1])} onApprove={approve}
+            onBack={() => { location.hash = '' }} />
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen md:flex">
@@ -157,14 +164,13 @@ export default function App() {
         <header className="no-print flex items-center justify-between gap-3 border-b border-line px-4 py-3 md:px-8">
           <div className="flex items-center gap-2 md:hidden text-brand"><Paw className="h-6 w-6" /><Brand brand={t.brand} product={t.product} /></div>
           <p className="hidden text-sm text-muted md:block">{t.tagline}</p>
-          <div className="flex gap-2">
-            <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="rounded-full border border-line px-3.5 py-1.5 text-sm hover:bg-sunk">{t.lang}</button>
-            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="rounded-full border border-line px-3.5 py-1.5 text-sm hover:bg-sunk">{theme === 'dark' ? t.themeLight : t.themeDark}</button>
-          </div>
+          {toggles}
         </header>
         <main className="flex-1 px-4 py-6 md:px-8">
-          {/* CheckIn is rendered as an element (not an inner component) so form text survives language/theme toggles. */}
-          {tab === 'checkin' ? <CheckIn t={t} lang={lang} visits={visits} setVisits={setVisits} /> : <Screen />}
+          {/* CheckIn and Consult are rendered as elements (not inner components) so typed text survives language/theme toggles. */}
+          {tab === 'checkin' ? <CheckIn t={t} lang={lang} visits={visits} setVisits={setVisits} />
+            : tab === 'consult' ? <Consult t={t} lang={lang} visits={visits} setVisits={setVisits} estimates={estimates} setEstimates={setEstimates} />
+            : <Screen />}
         </main>
       </div>
 

@@ -34,3 +34,26 @@ CREATE TABLE IF NOT EXISTS medical_records (
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
 );
+
+-- Step 2: consultation + estimate (new tables; existing tables unchanged)
+CREATE TABLE IF NOT EXISTS visits (
+  id TEXT PRIMARY KEY,
+  pet_id TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'waiting', -- waiting | with_vet | lab | ready
+  reason TEXT,
+  exam_notes TEXT,
+  arrived_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS estimates (
+  id TEXT PRIMARY KEY,
+  visit_id TEXT NOT NULL,
+  public_uuid TEXT NOT NULL UNIQUE,    -- crypto.randomUUID(), used in the public estimate link
+  options_json TEXT NOT NULL,          -- basic / standard / full: service lines + total (SAR)
+  status TEXT NOT NULL DEFAULT 'sent', -- sent | approved
+  approved_option TEXT,                -- basic | standard | full
+  approved_at TEXT,
+  created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (visit_id) REFERENCES visits(id) ON DELETE CASCADE
+);

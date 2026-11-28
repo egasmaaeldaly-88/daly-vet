@@ -27,3 +27,6 @@ export function formatSaPhone(p) {
   const m = /^966(5\d)(\d{3})(\d{4})$/.exec(p || '')
   return m ? `+966 ${m[1]} ${m[2]} ${m[3]}` : p
 }
+
+/** Pick the right language from a bilingual `{ ar, en }` value, or return a plain string as-is. */
+export const tx = (v, lang) => (typeof v === 'string' ? v : v?.[lang] ?? '')
