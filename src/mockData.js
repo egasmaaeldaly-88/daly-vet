@@ -13,9 +13,9 @@ export const pets = [
 ]
 
 export const vaccinations = [
-  { id: 'v1', petId: 'p1', vaccine: { ar: 'الثلاثي القطط', en: 'FVRCP' }, due: '2026-12-02', state: 'soon' },
-  { id: 'v2', petId: 'p2', vaccine: { ar: 'السعار', en: 'Rabies' }, due: '2026-11-10', state: 'overdue' },
-  { id: 'v3', petId: 'p3', vaccine: { ar: 'مضاد الديدان', en: 'Deworming' }, due: '2027-02-15', state: 'ok' },
+  { id: 'v1', petId: 'p1', vaccine: { ar: 'الثلاثي القطط', en: 'FVRCP' }, given: '2025-12-02', due: '2026-12-02', state: 'soon' },
+  { id: 'v2', petId: 'p2', vaccine: { ar: 'السعار', en: 'Rabies' }, given: '2025-11-10', due: '2026-11-10', state: 'overdue' },
+  { id: 'v3', petId: 'p3', vaccine: { ar: 'مضاد الديدان', en: 'Deworming' }, given: '2026-11-15', due: '2027-02-15', state: 'ok' },
 ]
 
 export const summaries = {

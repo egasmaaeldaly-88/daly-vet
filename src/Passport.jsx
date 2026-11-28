@@ -31,7 +31,13 @@ function PassportBody({ pet, t, lang, vaccinations, summaries, clinic, showQr })
       <Card title={t.passport.vacc}>
         <ul className="space-y-2">
           {vacc.map((v) => (
-            <li key={v.id} className="flex justify-between gap-3"><span>{tx(v.vaccine, lang)}</span><span className="text-muted">{t.passport.next}: {formatDueDate(v.due, lang)}</span></li>
+            <li key={v.id} className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+              <span className="font-medium">{tx(v.vaccine, lang)}</span>
+              <span className="text-end text-sm text-muted">
+                {t.passport.given}: {formatDueDate(v.given, lang)}
+                <span className="block">{t.passport.next}: {formatDueDate(v.due, lang)}</span>
+              </span>
+            </li>
           ))}
         </ul>
       </Card>
