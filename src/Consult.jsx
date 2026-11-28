@@ -120,11 +120,13 @@ export default function Consult({ t, lang, visits, setVisits, estimates, setEsti
       </Card>
 
       <Card title={t.consult.performed}>
-        <p className="mb-3 text-sm text-muted">{visit.closedAt ? t.consult.performedLocked : t.consult.performedHint}</p>
+        {visit.closedAt
+          ? <p role="status" className="mb-3 rounded-xl bg-warn-tint px-4 py-2.5 text-sm font-medium text-warn">{t.consult.performedLocked}</p>
+          : <p className="mb-3 text-sm text-muted">{t.consult.performedHint}</p>}
         <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {SERVICES.map((s) => (
             <li key={s.id}>
-              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 ${performed.includes(s.id) ? 'border-brand bg-tint font-semibold text-brand' : 'border-line'}`}>
+              <label className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${visit.closedAt ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${performed.includes(s.id) ? 'border-brand bg-tint font-semibold text-brand' : 'border-line'}`}>
                 <input type="checkbox" className="h-5 w-5" style={{ accentColor: 'var(--brand)' }}
                   checked={performed.includes(s.id)} disabled={!!visit.closedAt} onChange={() => togglePerformed(s.id)} />
                 <span>{tx(s.name, lang)}</span>
